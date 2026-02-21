@@ -1,0 +1,115 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+.Python
+
+# ========================
+# Flask
+# ========================
+instance/
+.webassets-cache
+
+# ========================
+# PyTorch / ML
+# ========================
+model/weights/*.pth
+model/weights/*.pt
+model/weights/*.onnx
+model/dataset/raw/
+model/dataset/processed/
+*.h5
+*.hdf5
+*.ckpt
+wandb/
+mlruns/
+*.tfevents*
+
+# ========================
+# Jupyter Notebooks
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# Flutter / Dart
+# ========================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+.metadata
+pubspec.lock
+
+# ========================
+# Firebase
+# ========================
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+storage-debug.log
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+.env.production
+.env.*.local
+*.key
+*.pem
+*.p12
+*.json.enc
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+
+# ========================
+# IDE / Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ========================
+# Agent / Automation
+# ========================
+*.auth-state.json
+opencode.json
+.agents/skills/
+
+# ========================
+# Misc
+# ========================
+*.log
+*.tmp
+*.temp
+node_modules/
+.cache/
