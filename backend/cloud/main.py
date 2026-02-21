@@ -52,6 +52,25 @@ def _download_image(bucket_name: str, object_name: str) -> tuple[np.ndarray, str
     return img, tmp_path
 
 
+def _write_result(tmp_path: str, storage_path: str) -> str:
+    """Write image path metadata to the Firestore results collection.
+
+    Args:
+        tmp_path: Absolute path to the image file in the container.
+        storage_path: Original object name in Firebase Storage.
+
+    Returns:
+        The auto-generated Firestore document ID.
+    """
+    doc_ref = db.collection("results").document()
+    doc_ref.set({
+        "tmp_path": tmp_path,
+        "storage_path": storage_path,
+        "createdAt": firestore.SERVER_TIMESTAMP,
+    })
+    return doc_ref.id
+
+
 def _preprocess_image(img: np.ndarray) -> np.ndarray:
     """Resize and normalize a BGR image for model input.
 
@@ -107,7 +126,14 @@ def handle_request() -> tuple[str, int]:
         logger.error("Failed to preprocess image: %s", exc)
         return "Failed to preprocess image", 500
 
-    # TODO: run model inference on `preprocessed` and write results to Firestore
+    try:
+        doc_id = _write_result(tmp_path, object_name)
+        logger.info("Wrote result document %s", doc_id)
+    except Exception as exc:
+        logger.error("Failed to write result to Firestore: %s", exc)
+        return "Failed to write result", 500
+
+    # TODO: run model inference on `preprocessed` and update Firestore document with results
 
     return "OK", 200
 
