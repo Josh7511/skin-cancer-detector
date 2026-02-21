@@ -1,11 +1,11 @@
 # Skin Cancer Detector Project Rules
 
 > **SYNC REQUIREMENT**: This file must be kept in sync with `.cursor/rules/project-standards.mdc`.
-> When updating rules, update BOTH files to maintain consistency across Cursor and OpenCode.
+> When updating rules, update BOTH files to maintain consistency across Cursor and Claude Code.
 
 ## About This Project
 
-Skin Cancer Detector is an AI-powered web application that analyzes images of skin lesions to detect potential skin cancer. Users upload a photo through a Flutter web frontend, the image is processed by a PyTorch deep learning model via a Flask backend, and results (confidence score + verdict) are returned to the user. Anonymous accounts are used to protect privacy.
+Skin Cancer Detector is an AI-powered application (web, Android, and iOS) that analyzes images of skin lesions to detect potential skin cancer. Users upload a photo through a Flutter frontend, the image is processed by a PyTorch deep learning model via a Flask backend, and results (confidence score + verdict) are returned to the user. Anonymous accounts are used to protect privacy.
 
 ### Architecture
 
@@ -15,7 +15,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
 
 ### Tech Stack
 
-- **Frontend**: Flutter (Dart) -- web application
+- **Frontend**: Flutter (Dart) -- web, Android, and iOS
 - **Backend**: Flask (Python) -- REST API
 - **AI/ML**: PyTorch (CNN classification), OpenCV (image preprocessing)
 - **Cloud**: Google Cloud Platform, Firebase (Auth, Storage, Firestore)
@@ -112,20 +112,20 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
 
 **CRITICAL**: When modifying project rules:
 
-1. **For OpenCode users**: Edit this `AGENTS.md` file, then copy changes to `.cursor/rules/project-standards.mdc` (preserving frontmatter)
+1. **For Claude Code users**: Edit this `AGENTS.md` file, then copy changes to `.cursor/rules/project-standards.mdc` (preserving frontmatter)
 2. **For Cursor users**: Edit `.cursor/rules/project-standards.mdc`, then copy changes to this `AGENTS.md` (removing frontmatter)
 3. **Content must match**: The main content body should be identical in both files
 4. **Version control**: Commit both files together when making rule changes
 
 ### File Locations
 
-- **OpenCode**: `/AGENTS.md` (this file)
+- **Claude Code**: `/AGENTS.md` (this file)
 - **Cursor**: `/.cursor/rules/project-standards.mdc`
 
 ### Differences to Preserve
 
 - Cursor files may have frontmatter metadata (`---` blocks at top)
-- OpenCode AGENTS.md should NOT have frontmatter
+- Claude Code AGENTS.md should NOT have frontmatter
 - Otherwise, content should be identical
 
 ## External File References
@@ -137,7 +137,7 @@ When referencing project files in rules, use the `@filename` syntax:
 @requirements.txt
 ```
 
-This works in both Cursor and OpenCode to include file content in context.
+This works in both Cursor and Claude Code to include file content in context.
 
 ## Code Review with CodeRabbit
 
