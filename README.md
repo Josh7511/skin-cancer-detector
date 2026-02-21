@@ -86,6 +86,10 @@ skin_cancer_detector/
 │       └── main.py           # Cloud Function entry point
 │       └── Dockerfile            # Container image for backend deployment
 │
+├── model/                     # ML model artifacts
+│   ├── weights/               # Trained .pt files (gitignored)
+│   └── test_images/           # Test images for local inference (gitignored)
+│
 ├── AGENTS.md                  # AI agent rules
 ├── .gitignore
 └── README.md                  # This file
