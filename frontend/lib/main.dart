@@ -5,9 +5,15 @@ import 'providers/theme_provider.dart';
 import 'screens/app_shell.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const SkinCancerDetectorApp());
+
+  // Load the persisted theme before building the widget tree
+  // to prevent a visible theme flash on startup.
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadTheme();
+
+  runApp(SkinCancerDetectorApp(themeProvider: themeProvider));
 }
 
 /// Root widget for the Skin Cancer Detector application.
@@ -16,15 +22,16 @@ void main() {
 /// light/dark theme based on user preference.
 class SkinCancerDetectorApp extends StatelessWidget {
   /// Creates the root [SkinCancerDetectorApp] widget.
-  const SkinCancerDetectorApp({super.key});
+  const SkinCancerDetectorApp({super.key, required this.themeProvider});
+
+  /// The pre-loaded [ThemeProvider] instance.
+  final ThemeProvider themeProvider;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider()..loadTheme(),
-        ),
+        ChangeNotifierProvider.value(value: themeProvider),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
