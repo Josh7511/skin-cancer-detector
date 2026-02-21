@@ -73,7 +73,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
   - `frontend/lib/widgets/` -- Reusable UI components
   - `frontend/lib/models/` -- Dart data models
   - `backend/cloud/main.py` -- Cloud Function entry point
-  - `backend/Dockerfile` -- Container image for backend deployment
+  - `backend/cloud/Dockerfile` -- Container image for backend deployment
 
 ## Documentation
 
