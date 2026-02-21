@@ -74,6 +74,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
   - `frontend/lib/models/` -- Dart data models
   - `backend/cloud/main.py` -- Cloud Function entry point
   - `backend/cloud/Dockerfile` -- Container image for backend deployment
+  - `backend/requirements.txt` -- Python dependencies
 
 ## Documentation
 
