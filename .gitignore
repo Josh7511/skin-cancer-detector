@@ -102,6 +102,8 @@ Desktop.ini
 # Agent / Automation
 # ========================
 *.auth-state.json
+opencode.json
+.agents/skills/
 
 # ========================
 # Misc

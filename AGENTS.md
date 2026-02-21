@@ -66,7 +66,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
 ## File Organization
 
 - Keep related files together in logical directories
-- Frontend code stays in `frontend/`, backend in `backend/`, ML in `model/`
+- Frontend code stays in `frontend/`, backend in `backend/`
 - Maintain clear separation of concerns:
   - `frontend/lib/screens/` -- UI screens
   - `frontend/lib/services/` -- Firebase/API service classes
@@ -76,7 +76,6 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
   - `backend/app/model.py` -- PyTorch model loading and inference
   - `backend/app/preprocessing.py` -- OpenCV image preprocessing
   - `backend/app/firebase_client.py` -- Firestore/Storage interactions
-  - `model/` -- Training scripts, notebooks, dataset management, weights
 
 ## Documentation
 
@@ -108,10 +107,6 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
 
 ## AI Model
 
-- Model architecture: CNN (convolutional neural network) for binary/multi-class classification
-- Training framework: PyTorch
-- Preprocessing pipeline: OpenCV (resize, normalize, color space conversion)
-- Model weights stored in `model/weights/` (git-ignored, tracked separately)
 - Inference endpoint must return: `{ verdict: string, confidence: float, recommendation: string }`
 - Confidence score is a percentage (0-100) representing the model's certainty
 

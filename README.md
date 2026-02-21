@@ -92,21 +92,13 @@ skin_cancer_detector/
 │   ├── Dockerfile
 │   └── ...
 │
-├── model/                     # ML model training and artifacts
-│   ├── train.py              # Training script
-│   ├── evaluate.py           # Model evaluation
-│   ├── dataset/              # Dataset management scripts
-│   ├── notebooks/            # Jupyter notebooks for exploration
-│   └── weights/              # Trained model weights (.pth)
-│
 ├── cloud/                     # Google Cloud configuration
 │   ├── functions/            # Cloud Functions (triggers)
 │   ├── firestore.rules       # Firestore security rules
 │   ├── storage.rules         # Storage security rules
 │   └── ...
 │
-├── AGENTS.md                  # OpenCode AI agent rules
-├── opencode.json              # OpenCode configuration
+├── AGENTS.md                  # AI agent rules
 ├── .gitignore
 └── README.md                  # This file
 ```
@@ -157,24 +149,6 @@ flutterfire configure
 
 # Run in Chrome
 flutter run -d chrome
-```
-
-### Model Training
-
-```bash
-# Navigate to model directory
-cd model/
-
-# Install training dependencies
-pip install -r requirements.txt
-
-# Download dataset (instructions in dataset/README.md)
-
-# Train the model
-python train.py --epochs 50 --batch-size 32
-
-# Evaluate
-python evaluate.py --weights weights/best_model.pth
 ```
 
 ## Environment Variables
