@@ -81,22 +81,9 @@ skin_cancer_detector/
 │   ├── pubspec.yaml
 │   └── ...
 │
-├── backend/                   # Flask API server
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── routes.py         # API endpoints
-│   │   ├── model.py          # PyTorch model loading and inference
-│   │   ├── preprocessing.py  # OpenCV image preprocessing
-│   │   └── firebase_client.py # Firestore and Storage client
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── ...
-│
-├── cloud/                     # Google Cloud configuration
-│   ├── functions/            # Cloud Functions (triggers)
-│   ├── firestore.rules       # Firestore security rules
-│   ├── storage.rules         # Storage security rules
-│   └── ...
+├── backend/                   # Backend services
+│   └── cloud/
+│       └── main.py           # Cloud Function entry point
 │
 ├── AGENTS.md                  # AI agent rules
 ├── .gitignore

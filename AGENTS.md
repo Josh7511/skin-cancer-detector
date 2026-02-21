@@ -72,10 +72,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
   - `frontend/lib/services/` -- Firebase/API service classes
   - `frontend/lib/widgets/` -- Reusable UI components
   - `frontend/lib/models/` -- Dart data models
-  - `backend/app/routes.py` -- API endpoint definitions
-  - `backend/app/model.py` -- PyTorch model loading and inference
-  - `backend/app/preprocessing.py` -- OpenCV image preprocessing
-  - `backend/app/firebase_client.py` -- Firestore/Storage interactions
+  - `backend/cloud/main.py` -- Cloud Function entry point
 
 ## Documentation
 
