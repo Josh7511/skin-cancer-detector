@@ -83,8 +83,9 @@ skin_cancer_detector/
 │
 ├── backend/                   # Backend services
 │   ├── cloud/
-│       └── main.py           # Cloud Function entry point
-│       └── Dockerfile            # Container image for backend deployment
+│   │   ├── main.py           # Cloud Function entry point
+│   │   └── Dockerfile        # Container image for backend deployment
+│   └── requirements.txt      # Python dependencies
 │
 ├── AGENTS.md                  # AI agent rules
 ├── .gitignore

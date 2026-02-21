@@ -1,0 +1,5 @@
+Flask
+gunicorn
+firebase-admin
+opencv-python-headless
+numpy
