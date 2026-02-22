@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -57,10 +56,14 @@ class _UploadScreenState extends State<UploadScreen> {
         _selectedImageName = picked.name;
         _errorMessage = null;
       });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to pick image. Please try again.';
-      });
+    } catch (e, stackTrace) {
+      debugPrint('Image picker error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to pick image: $e';
+        });
+      }
     }
   }
 
@@ -76,8 +79,7 @@ class _UploadScreenState extends State<UploadScreen> {
     });
 
     try {
-      final userId =
-          context.read<AuthProvider>().userId ?? 'anonymous';
+      final userId = context.read<AuthProvider>().userId ?? 'anonymous';
 
       // Upload image.
       setState(() => _statusMessage = 'Uploading image...');
