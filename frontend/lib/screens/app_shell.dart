@@ -11,9 +11,27 @@ import 'upload_screen.dart';
 ///
 /// Uses an [IndexedStack] so that each tab preserves its state when
 /// the user switches between them.
+///
+/// Exposes a static [switchTab] method so child screens can
+/// programmatically navigate to a different tab (e.g., the Home
+/// screen's "Start Scan" button switching to the Upload tab).
 class AppShell extends StatefulWidget {
   /// Creates an [AppShell] widget.
   const AppShell({super.key});
+
+  /// Tab indices for programmatic navigation.
+  static const int homeTab = 0;
+  static const int scanTab = 1;
+  static const int historyTab = 2;
+  static const int aboutTab = 3;
+
+  /// Switches to the given [tabIndex] from anywhere in the widget tree.
+  ///
+  /// Requires a [BuildContext] that is a descendant of [AppShell].
+  static void switchTab(BuildContext context, int tabIndex) {
+    final state = context.findAncestorStateOfType<_AppShellState>();
+    state?._setTab(tabIndex);
+  }
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -36,10 +54,15 @@ class _AppShellState extends State<AppShell> {
     'About',
   ];
 
+  void _setTab(int index) {
+    setState(() => _currentIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Text(_titles[_currentIndex]),
         actions: const [
           ThemeToggle(),
@@ -51,7 +74,7 @@ class _AppShellState extends State<AppShell> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: _setTab,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
