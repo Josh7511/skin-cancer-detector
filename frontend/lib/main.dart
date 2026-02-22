@@ -6,6 +6,8 @@ import 'providers/history_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/app_shell.dart';
 import 'theme/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +16,10 @@ void main() async {
   // to prevent a visible theme flash on startup.
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(SkinCancerDetectorApp(themeProvider: themeProvider));
 }
