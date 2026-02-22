@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/auth_provider.dart';
+import 'providers/history_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/app_shell.dart';
 import 'theme/app_theme.dart';
@@ -18,8 +20,9 @@ void main() async {
 
 /// Root widget for the Skin Cancer Detector application.
 ///
-/// Sets up [Provider] for state management and applies the
-/// light/dark theme based on user preference.
+/// Sets up [Provider] instances for theme, authentication, and history
+/// state management, and applies the light/dark theme based on user
+/// preference.
 class SkinCancerDetectorApp extends StatelessWidget {
   /// Creates the root [SkinCancerDetectorApp] widget.
   const SkinCancerDetectorApp({super.key, required this.themeProvider});
@@ -32,6 +35,12 @@ class SkinCancerDetectorApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider()..signIn(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => HistoryProvider()..loadHistory(),
+        ),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
