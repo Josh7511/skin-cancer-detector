@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/analysis_result.dart';
@@ -56,20 +59,8 @@ class ScanCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Risk icon.
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _riskColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  _riskIcon,
-                  color: _riskColor,
-                  size: 28,
-                ),
-              ),
+              // Image thumbnail or risk icon fallback.
+              _buildThumbnail(),
               const SizedBox(width: 16),
 
               // Verdict and date.
@@ -87,8 +78,8 @@ class ScanCard extends StatelessWidget {
                     Text(
                       _formatDate(result.createdAt),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
@@ -126,14 +117,51 @@ class ScanCard extends StatelessWidget {
     );
   }
 
+  Widget _buildThumbnail() {
+    final hasLocalImage = !kIsWeb &&
+        result.localImagePath != null &&
+        File(result.localImagePath!).existsSync();
+
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: _riskColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasLocalImage
+          ? Image.file(
+              File(result.localImagePath!),
+              fit: BoxFit.cover,
+              width: 48,
+              height: 48,
+            )
+          : Icon(
+              _riskIcon,
+              color: _riskColor,
+              size: 28,
+            ),
+    );
+  }
+
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
-    final hour = date.hour > 12
-        ? date.hour - 12
-        : (date.hour == 0 ? 12 : date.hour);
+    final hour =
+        date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
     final period = date.hour >= 12 ? 'PM' : 'AM';
     final minute = date.minute.toString().padLeft(2, '0');
     return '${months[date.month - 1]} ${date.day}, ${date.year} '

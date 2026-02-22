@@ -3,7 +3,9 @@ WORKDIR /usr/local/app
 
 # Install the application dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip uninstall -y opencv-python \
+    && pip install --no-cache-dir --force-reinstall "opencv-python-headless>=4.10.0"
 
 # Copy in the source code
 COPY . .

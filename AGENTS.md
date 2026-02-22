@@ -89,7 +89,7 @@ Flutter -> Firebase Storage -> Flask -> OpenCV/PyTorch -> Firestore -> Flutter
 ### Firestore
 
 - Use the Firebase Admin SDK in the backend for Firestore reads/writes
-- Structure: `analyses/{anonymousUserId}/results/{analysisId}`
+- Structure: `results/{analysisId}`
 - Always include `createdAt` timestamp in documents
 - Keep Firestore security rules restrictive -- anonymous users should only read their own results
 

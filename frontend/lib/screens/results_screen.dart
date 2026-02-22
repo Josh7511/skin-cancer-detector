@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/analysis_result.dart';
@@ -6,14 +9,27 @@ import '../widgets/confidence_gauge.dart';
 
 /// Screen displaying the results of a skin lesion analysis.
 ///
-/// Shows a color-coded [ConfidenceGauge], the verdict, a recommendation
-/// card, and actions to scan another image or view history.
+/// Shows the scanned image, a color-coded [ConfidenceGauge], the verdict,
+/// a recommendation card, and actions to scan another image or view history.
 class ResultsScreen extends StatelessWidget {
   /// Creates a [ResultsScreen] with the given [result].
-  const ResultsScreen({required this.result, super.key});
+  ///
+  /// When navigating from a fresh scan, [imageBytes] can be provided
+  /// for immediate display. When viewing from history, the image is
+  /// loaded from [AnalysisResult.localImagePath].
+  const ResultsScreen({
+    required this.result,
+    this.imageBytes,
+    super.key,
+  });
 
   /// The analysis result to display.
   final AnalysisResult result;
+
+  /// Raw image bytes for immediate display from a fresh scan.
+  ///
+  /// If `null`, the widget falls back to [result.localImagePath].
+  final Uint8List? imageBytes;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +46,10 @@ class ResultsScreen extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 500),
             child: Column(
               children: [
+                // ── Scanned Image ───────────────────────────────────
+                _buildImagePreview(theme),
+                const SizedBox(height: 24),
+
                 // ── Confidence Gauge ────────────────────────────────
                 ConfidenceGauge(
                   confidence: result.confidence,
@@ -50,8 +70,7 @@ class ResultsScreen extends StatelessWidget {
                 Text(
                   _formatDate(result.createdAt),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -79,8 +98,7 @@ class ResultsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 'Recommendation',
-                                style:
-                                    theme.textTheme.titleSmall?.copyWith(
+                                style: theme.textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -114,8 +132,7 @@ class ResultsScreen extends StatelessWidget {
                   'This result is for informational purposes only and '
                   'should not be used as a medical diagnosis.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     fontStyle: FontStyle.italic,
                   ),
                   textAlign: TextAlign.center,
@@ -125,6 +142,45 @@ class ResultsScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePreview(ThemeData theme) {
+    Widget? imageWidget;
+
+    if (imageBytes != null) {
+      imageWidget = Image.memory(
+        imageBytes!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    } else if (!kIsWeb &&
+        result.localImagePath != null &&
+        File(result.localImagePath!).existsSync()) {
+      imageWidget = Image.file(
+        File(result.localImagePath!),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    }
+
+    if (imageWidget == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      height: 220,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: imageWidget,
     );
   }
 
@@ -163,8 +219,18 @@ class ResultsScreen extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
     final period = date.hour >= 12 ? 'PM' : 'AM';
