@@ -59,7 +59,7 @@ class ResultsScreen extends StatelessWidget {
 
                 // ── Verdict ─────────────────────────────────────────
                 Text(
-                  result.verdict,
+                  _capitalizeVerdict(result.verdict),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: _verdictColor(result.riskLevel),
@@ -218,11 +218,16 @@ class ResultsScreen extends StatelessWidget {
     }
   }
 
+  String _capitalizeVerdict(String verdict) {
+    if (verdict.isEmpty) return verdict;
+    return verdict[0].toUpperCase() + verdict.substring(1).toLowerCase();
+  }
+
   String _defaultRecommendation(RiskLevel level) {
     switch (level) {
       case RiskLevel.low:
-        return 'The lesion appears low-risk. Monitor for changes and consult '
-            'a healthcare provider if anything develops.';
+        return 'There is a low likelihood of this being a risk. If it still '
+            'concerns you, seek medical attention for peace of mind.';
       case RiskLevel.moderate:
         return 'The result is inconclusive. Consider visiting a dermatologist '
             'for a professional evaluation.';

@@ -66,12 +66,27 @@ class AnalysisResult {
     );
   }
 
-  /// Returns the risk level based on the confidence score.
+  /// Whether the verdict indicates a benign (non-cancerous) classification.
+  bool get isBenign => verdict.toLowerCase() == 'benign';
+
+  /// Returns the risk level based on the verdict and confidence score.
   ///
-  /// - [RiskLevel.low]: 0–30%
-  /// - [RiskLevel.moderate]: 31–60%
-  /// - [RiskLevel.high]: 61–100%
+  /// For benign verdicts the scale is inverted — high confidence in
+  /// "benign" means low risk (green):
+  /// - 61–100% confidence → [RiskLevel.low]
+  /// - 31–60% confidence  → [RiskLevel.moderate]
+  /// - 0–30% confidence   → [RiskLevel.high]
+  ///
+  /// For all other (potentially malignant) verdicts:
+  /// - 0–30% confidence   → [RiskLevel.low]
+  /// - 31–60% confidence  → [RiskLevel.moderate]
+  /// - 61–100% confidence → [RiskLevel.high]
   RiskLevel get riskLevel {
+    if (isBenign) {
+      if (confidence >= 61) return RiskLevel.low;
+      if (confidence >= 31) return RiskLevel.moderate;
+      return RiskLevel.high;
+    }
     if (confidence <= 30) return RiskLevel.low;
     if (confidence <= 60) return RiskLevel.moderate;
     return RiskLevel.high;
