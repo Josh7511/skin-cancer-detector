@@ -7,7 +7,7 @@ from ultralytics import YOLO
 logger = logging.getLogger(__name__)
 
 BUCKET_NAME = "derma-3fec9-2"
-WEIGHTS_PATH = "models/best.pt"
+WEIGHTS_PATH = "best.pt"
 
 
 def load_model() -> YOLO:
@@ -16,15 +16,49 @@ def load_model() -> YOLO:
     Returns:
         A loaded YOLO model ready for inference.
     """
-    bucket = storage.bucket(BUCKET_NAME)
-    blob = bucket.blob(WEIGHTS_PATH)
+    # #region agent log
+    logger.info("[DEBUG][H1/H2] load_model: entry — bucket=%s path=%s", BUCKET_NAME, WEIGHTS_PATH)
+    # #endregion
+    try:
+        bucket = storage.bucket(BUCKET_NAME)
+        blob = bucket.blob(WEIGHTS_PATH)
+        # #region agent log
+        logger.info("[DEBUG][H1] load_model: bucket access OK, blob exists=%s", blob.exists())
+        # #endregion
+    except Exception as exc:
+        # #region agent log
+        logger.error("[DEBUG][H1] load_model: bucket/blob access FAILED — %s", exc)
+        # #endregion
+        raise
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp:
-        blob.download_to_file(tmp)
-        tmp_path = tmp.name
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp:
+            blob.download_to_file(tmp)
+            tmp_path = tmp.name
+        # #region agent log
+        import os as _os
+        logger.info("[DEBUG][H2/H3] load_model: weights downloaded — tmp=%s size=%s bytes", tmp_path, _os.path.getsize(tmp_path))
+        # #endregion
+    except Exception as exc:
+        # #region agent log
+        logger.error("[DEBUG][H2] load_model: weights download FAILED — %s", exc)
+        # #endregion
+        raise
 
-    logger.info("Model weights saved to container path: %s", tmp_path)
-    return YOLO(tmp_path)
+    try:
+        # #region agent log
+        logger.info("[DEBUG][H4] load_model: loading YOLO model from %s", tmp_path)
+        # #endregion
+        model = YOLO(tmp_path)
+        # #region agent log
+        logger.info("[DEBUG][H4] load_model: YOLO model loaded OK")
+        # #endregion
+        return model
+    except Exception as exc:
+        # #region agent log
+        logger.error("[DEBUG][H4] load_model: YOLO load FAILED — %s", exc)
+        # #endregion
+        raise
 
 
 def predict(model: YOLO, image_path: str) -> dict:

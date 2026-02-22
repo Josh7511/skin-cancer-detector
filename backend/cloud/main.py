@@ -9,6 +9,8 @@ from cloudevents.http import from_http
 from firebase_admin import firestore, storage
 from flask import Flask, request
 
+from predict import load_model, predict as run_predict
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,20 @@ if not firebase_admin._apps:
 db = firestore.client(database_id="derma")
 
 IMAGE_SIZE = (224, 224)
+
+# #region agent log
+logger.info("[DEBUG][post-fix] main: about to call load_model() at startup")
+# #endregion
+try:
+    model = load_model()
+    # #region agent log
+    logger.info("[DEBUG][post-fix] main: load_model() completed successfully")
+    # #endregion
+except Exception as exc:
+    # #region agent log
+    logger.error("[DEBUG][post-fix] main: load_model() raised at startup — %s: %s", type(exc).__name__, exc)
+    # #endregion
+    raise
 
 
 def _download_image(bucket_name: str, object_name: str) -> tuple[np.ndarray, str]:
@@ -52,19 +68,20 @@ def _download_image(bucket_name: str, object_name: str) -> tuple[np.ndarray, str
     return img, tmp_path
 
 
-def _write_result(tmp_path: str, storage_path: str) -> str:
-    """Write image path metadata to the Firestore results collection.
+def _write_result(analysis_id: str, storage_path: str, result: dict) -> str:
+    """Write inference results to the Firestore results collection.
 
     Args:
-        tmp_path: Absolute path to the image file in the container.
+        analysis_id: Document ID derived from the uploaded image filename.
         storage_path: Original object name in Firebase Storage.
+        result: Prediction dict containing verdict and confidence.
 
     Returns:
-        The auto-generated Firestore document ID.
+        The Firestore document ID.
     """
-    doc_ref = db.collection("results").document()
+    doc_ref = db.collection("results").document(analysis_id)
     doc_ref.set({
-        "tmp_path": tmp_path,
+        **result,
         "storage_path": storage_path,
         "createdAt": firestore.SERVER_TIMESTAMP,
     })
@@ -109,8 +126,10 @@ def handle_request() -> tuple[str, int]:
         logger.error("CloudEvent missing bucket or name: %s", event_data)
         return "Missing bucket or object name in event data", 400
 
-    image_dir = os.path.dirname(object_name)
-    logger.info("Processing gs://%s/%s (directory: %s)", bucket_name, object_name, image_dir)
+    analysis_id = os.path.splitext(os.path.basename(object_name))[0]
+    logger.info(
+        "Processing gs://%s/%s (analysis_id: %s)", bucket_name, object_name, analysis_id
+    )
 
     try:
         img, tmp_path = _download_image(bucket_name, object_name)
@@ -127,13 +146,18 @@ def handle_request() -> tuple[str, int]:
         return "Failed to preprocess image", 500
 
     try:
-        doc_id = _write_result(tmp_path, object_name)
+        result = run_predict(model, tmp_path)
+        logger.info("Inference result: %s", result)
+    except Exception as exc:
+        logger.error("Failed to run inference: %s", exc)
+        return "Failed to run inference", 500
+
+    try:
+        doc_id = _write_result(analysis_id, object_name, result)
         logger.info("Wrote result document %s", doc_id)
     except Exception as exc:
         logger.error("Failed to write result to Firestore: %s", exc)
         return "Failed to write result", 500
-
-    # TODO: run model inference on `preprocessed` and update Firestore document with results
 
     return "OK", 200
 
