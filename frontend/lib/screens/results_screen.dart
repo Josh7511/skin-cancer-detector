@@ -39,7 +39,7 @@ class ResultsScreen extends StatelessWidget {
 
                 // ── Verdict ─────────────────────────────────────────
                 Text(
-                  result.verdict,
+                  _capitalizeVerdict(result.verdict),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: _verdictColor(result.riskLevel),
@@ -50,8 +50,7 @@ class ResultsScreen extends StatelessWidget {
                 Text(
                   _formatDate(result.createdAt),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -79,8 +78,7 @@ class ResultsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 'Recommendation',
-                                style:
-                                    theme.textTheme.titleSmall?.copyWith(
+                                style: theme.textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -115,8 +113,7 @@ class ResultsScreen extends StatelessWidget {
                   'This result is for informational purposes only and '
                   'should not be used as a medical diagnosis.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     fontStyle: FontStyle.italic,
                   ),
                   textAlign: TextAlign.center,
@@ -162,11 +159,16 @@ class ResultsScreen extends StatelessWidget {
     }
   }
 
+  String _capitalizeVerdict(String verdict) {
+    if (verdict.isEmpty) return verdict;
+    return verdict[0].toUpperCase() + verdict.substring(1).toLowerCase();
+  }
+
   String _defaultRecommendation(RiskLevel level) {
     switch (level) {
       case RiskLevel.low:
-        return 'The lesion appears low-risk. Monitor for changes and consult '
-            'a healthcare provider if anything develops.';
+        return 'There is a low likelihood of this being a risk. If it still '
+            'concerns you, seek medical attention for peace of mind.';
       case RiskLevel.moderate:
         return 'The result is inconclusive. Consider visiting a dermatologist '
             'for a professional evaluation.';
@@ -178,8 +180,18 @@ class ResultsScreen extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
     final period = date.hour >= 12 ? 'PM' : 'AM';
