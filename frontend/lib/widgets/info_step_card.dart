@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// A card displaying a single step in the "How It Works" section.
+/// A compact card displaying a single step in the "How It Works" section.
 ///
-/// Shows a numbered icon, a title, and a description arranged
-/// vertically within a styled card.
+/// Uses a horizontal row layout with a numbered icon on the left and
+/// a title + description on the right to minimise vertical space.
 class InfoStepCard extends StatelessWidget {
   /// Creates an [InfoStepCard].
   const InfoStepCard({
@@ -32,19 +32,19 @@ class InfoStepCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
           children: [
             Stack(
               alignment: Alignment.bottomRight,
               children: [
                 Icon(
                   icon,
-                  size: 48,
+                  size: 36,
                   color: theme.colorScheme.primary,
                 ),
                 Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary,
                     shape: BoxShape.circle,
@@ -54,26 +54,32 @@ class InfoStepCard extends StatelessWidget {
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

@@ -43,7 +43,7 @@ class AboutScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'Our system uses a convolutional neural network (CNN) '
-                'trained on dermatological image datasets to classify '
+                'trained on a dermatological image dataset to classify '
                 'skin lesions. When you upload a photo, the image is '
                 'preprocessed and fed through the model, which outputs '
                 'a classification and a confidence score indicating how '

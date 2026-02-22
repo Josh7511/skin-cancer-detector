@@ -62,6 +62,7 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Text(_titles[_currentIndex]),
         actions: const [
           ThemeToggle(),
