@@ -87,6 +87,10 @@ skin_cancer_detector/
 │   │   └── Dockerfile        # Container image for backend deployment
 │   └── requirements.txt      # Python dependencies
 │
+├── model/                     # ML model artifacts
+│   ├── weights/               # Trained .pt files (gitignored)
+│   └── test_images/           # Test images for local inference (gitignored)
+│
 ├── AGENTS.md                  # AI agent rules
 ├── .gitignore
 └── README.md                  # This file

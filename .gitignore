@@ -25,14 +25,16 @@ instance/
 # ========================
 # PyTorch / ML
 # ========================
-model/weights/*.pth
-model/weights/*.pt
-model/weights/*.onnx
+model/weights/*
+!model/weights/.gitkeep
+model/test_images/*
+!model/test_images/.gitkeep
 model/dataset/raw/
 model/dataset/processed/
 *.h5
 *.hdf5
 *.ckpt
+runs/
 wandb/
 mlruns/
 *.tfevents*
