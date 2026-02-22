@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,8 +10,13 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode _themeMode = ThemeMode.system;
 
+  bool _isLoaded = false;
+
   /// The current [ThemeMode].
   ThemeMode get themeMode => _themeMode;
+
+  /// Whether the persisted theme preference has been loaded.
+  bool get isLoaded => _isLoaded;
 
   /// Whether dark mode is currently active.
   ///
@@ -18,16 +25,28 @@ class ThemeProvider extends ChangeNotifier {
 
   /// Loads the saved theme preference from [SharedPreferences].
   ///
-  /// Should be called once during app initialization.
+  /// Should be called once during app initialization. Falls back to
+  /// [ThemeMode.system] if the stored value is invalid or if loading fails.
   Future<void> loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString(_themeKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(_themeKey);
 
-    if (stored != null) {
-      _themeMode = ThemeMode.values.firstWhere(
-        (mode) => mode.name == stored,
-        orElse: () => ThemeMode.system,
+      if (stored != null) {
+        _themeMode = ThemeMode.values.firstWhere(
+          (mode) => mode.name == stored,
+          orElse: () => ThemeMode.system,
+        );
+      }
+    } catch (e) {
+      developer.log(
+        'Failed to load theme preference',
+        error: e,
+        name: 'ThemeProvider',
       );
+      // Keep default ThemeMode.system on failure.
+    } finally {
+      _isLoaded = true;
       notifyListeners();
     }
   }
@@ -37,7 +56,17 @@ class ThemeProvider extends ChangeNotifier {
     _themeMode = isDarkMode ? ThemeMode.light : ThemeMode.dark;
     notifyListeners();
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeKey, _themeMode.name);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_themeKey, _themeMode.name);
+    } catch (e) {
+      developer.log(
+        'Failed to persist theme preference',
+        error: e,
+        name: 'ThemeProvider',
+      );
+      // Theme is already toggled in memory; persistence failure
+      // is non-critical — preference will reset on next launch.
+    }
   }
 }
