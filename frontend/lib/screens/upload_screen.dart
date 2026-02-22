@@ -83,15 +83,15 @@ class _UploadScreenState extends State<UploadScreen> {
 
       // Upload image.
       setState(() => _statusMessage = 'Uploading image...');
-      final imageUrl = await _storageService.uploadImage(
+      final (downloadUrl: _, :analysisId) = await _storageService.uploadImage(
         bytes: _selectedImageBytes!,
         filename: _selectedImageName ?? 'image.jpg',
         userId: userId,
       );
 
-      // Analyze image.
-      setState(() => _statusMessage = 'Analyzing image...');
-      final result = await _analysisService.analyzeImage(imageUrl);
+      // Wait for the backend to process the image and write the result.
+      setState(() => _statusMessage = 'Waiting for analysis results...');
+      final result = await _analysisService.analyzeImage(analysisId);
 
       // Save to history.
       if (mounted) {

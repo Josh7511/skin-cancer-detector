@@ -1,34 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Data model representing the result of a skin lesion analysis.
 ///
-/// Contains the verdict, confidence score, recommendation, and metadata
-/// returned by the backend after processing an uploaded image.
+/// Contains the verdict, confidence score, and metadata returned by the
+/// backend after processing an uploaded image.
 class AnalysisResult {
   /// Creates an [AnalysisResult].
   const AnalysisResult({
     required this.id,
     required this.verdict,
     required this.confidence,
-    required this.recommendation,
     required this.createdAt,
+    this.recommendation,
     this.imageUrl,
   });
 
-  /// Unique identifier for this analysis.
+  /// Unique identifier for this analysis (matches the Firestore document ID).
   final String id;
 
-  /// The classification verdict (e.g., "Benign", "Potentially Malignant").
+  /// The classification verdict (e.g., "benign", "melanoma").
   final String verdict;
 
   /// Confidence score as a percentage (0–100).
   final double confidence;
 
   /// Contextual recommendation based on the analysis outcome.
-  final String recommendation;
+  ///
+  /// May be `null` when the result comes directly from Firestore, as the
+  /// backend does not currently generate recommendations.
+  final String? recommendation;
 
   /// Timestamp when the analysis was created.
   final DateTime createdAt;
 
-  /// URL of the uploaded image in Firebase Storage.
+  /// Path of the uploaded image in Firebase Storage.
   ///
   /// May be `null` if the image has been deleted after processing.
   final String? imageUrl;
@@ -44,15 +49,31 @@ class AnalysisResult {
     return RiskLevel.high;
   }
 
+  /// Creates an [AnalysisResult] from a Firestore document snapshot.
+  ///
+  /// Expects the document shape written by the Cloud Run backend:
+  /// `{ verdict, confidence, storage_path, createdAt }`.
+  factory AnalysisResult.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
+    return AnalysisResult(
+      id: doc.id,
+      verdict: data['verdict'] as String,
+      confidence: (data['confidence'] as num).toDouble(),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      imageUrl: data['storage_path'] as String?,
+      recommendation: null,
+    );
+  }
+
   /// Creates an [AnalysisResult] from a JSON map.
   ///
-  /// Used for deserializing Firestore documents and local storage data.
+  /// Used for deserializing locally cached results.
   factory AnalysisResult.fromJson(Map<String, dynamic> json) {
     return AnalysisResult(
       id: json['id'] as String,
       verdict: json['verdict'] as String,
       confidence: (json['confidence'] as num).toDouble(),
-      recommendation: json['recommendation'] as String,
+      recommendation: json['recommendation'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       imageUrl: json['imageUrl'] as String?,
     );
@@ -60,7 +81,7 @@ class AnalysisResult {
 
   /// Serializes this [AnalysisResult] to a JSON map.
   ///
-  /// Used for writing to Firestore and local storage.
+  /// Used for writing to local storage cache.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
