@@ -11,6 +11,7 @@ class AnalysisResult {
     required this.recommendation,
     required this.createdAt,
     this.imageUrl,
+    this.localImagePath,
   });
 
   /// Unique identifier for this analysis.
@@ -32,6 +33,33 @@ class AnalysisResult {
   ///
   /// May be `null` if the image has been deleted after processing.
   final String? imageUrl;
+
+  /// Path to the locally saved copy of the scanned image.
+  ///
+  /// Used for displaying the image in results and history screens
+  /// without requiring a network request.
+  final String? localImagePath;
+
+  /// Returns a copy of this result with the given fields replaced.
+  AnalysisResult copyWith({
+    String? id,
+    String? verdict,
+    double? confidence,
+    String? recommendation,
+    DateTime? createdAt,
+    String? imageUrl,
+    String? localImagePath,
+  }) {
+    return AnalysisResult(
+      id: id ?? this.id,
+      verdict: verdict ?? this.verdict,
+      confidence: confidence ?? this.confidence,
+      recommendation: recommendation ?? this.recommendation,
+      createdAt: createdAt ?? this.createdAt,
+      imageUrl: imageUrl ?? this.imageUrl,
+      localImagePath: localImagePath ?? this.localImagePath,
+    );
+  }
 
   /// Returns the risk level based on the confidence score.
   ///
@@ -55,6 +83,7 @@ class AnalysisResult {
       recommendation: json['recommendation'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       imageUrl: json['imageUrl'] as String?,
+      localImagePath: json['localImagePath'] as String?,
     );
   }
 
@@ -69,6 +98,7 @@ class AnalysisResult {
       'recommendation': recommendation,
       'createdAt': createdAt.toIso8601String(),
       'imageUrl': imageUrl,
+      'localImagePath': localImagePath,
     };
   }
 }
