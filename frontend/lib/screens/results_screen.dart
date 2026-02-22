@@ -86,7 +86,8 @@ class ResultsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                result.recommendation,
+                                result.recommendation ??
+                                    _defaultRecommendation(result.riskLevel),
                                 style: theme.textTheme.bodyMedium,
                               ),
                             ],
@@ -158,6 +159,20 @@ class ResultsScreen extends StatelessWidget {
         return Icons.info_outline;
       case RiskLevel.high:
         return Icons.warning_amber_rounded;
+    }
+  }
+
+  String _defaultRecommendation(RiskLevel level) {
+    switch (level) {
+      case RiskLevel.low:
+        return 'The lesion appears low-risk. Monitor for changes and consult '
+            'a healthcare provider if anything develops.';
+      case RiskLevel.moderate:
+        return 'The result is inconclusive. Consider visiting a dermatologist '
+            'for a professional evaluation.';
+      case RiskLevel.high:
+        return 'The lesion may require attention. We recommend consulting a '
+            'dermatologist as soon as possible for a professional evaluation.';
     }
   }
 
