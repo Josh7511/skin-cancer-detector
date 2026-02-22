@@ -7,6 +7,7 @@ import '../models/analysis_result.dart';
 import '../providers/auth_provider.dart';
 import '../providers/history_provider.dart';
 import '../services/analysis_service.dart';
+import '../services/image_cache_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/step_indicator.dart';
 import 'results_screen.dart';
@@ -30,6 +31,7 @@ class _UploadScreenState extends State<UploadScreen> {
   final _imagePicker = ImagePicker();
   final _storageService = StorageService();
   final _analysisService = AnalysisService();
+  final _imageCacheService = ImageCacheService();
 
   int _currentStep = 0;
   Uint8List? _selectedImageBytes;
@@ -91,7 +93,16 @@ class _UploadScreenState extends State<UploadScreen> {
 
       // Wait for the backend to process the image and write the result.
       setState(() => _statusMessage = 'Waiting for analysis results...');
-      final result = await _analysisService.analyzeImage(analysisId);
+      var result = await _analysisService.analyzeImage(analysisId);
+
+      // Save image locally for history display.
+      final localPath = await _imageCacheService.saveImage(
+        bytes: _selectedImageBytes!,
+        analysisId: result.id,
+      );
+      if (localPath != null) {
+        result = result.copyWith(localImagePath: localPath);
+      }
 
       // Save to history.
       if (mounted) {
@@ -111,9 +122,15 @@ class _UploadScreenState extends State<UploadScreen> {
   void _navigateToResults(AnalysisResult result) {
     if (!mounted) return;
 
+    // Capture bytes before resetting state.
+    final imageBytes = _selectedImageBytes;
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ResultsScreen(result: result),
+        builder: (_) => ResultsScreen(
+          result: result,
+          imageBytes: imageBytes,
+        ),
       ),
     );
 

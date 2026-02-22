@@ -13,6 +13,7 @@ class AnalysisResult {
     required this.createdAt,
     this.recommendation,
     this.imageUrl,
+    this.localImagePath,
   });
 
   /// Unique identifier for this analysis (matches the Firestore document ID).
@@ -38,6 +39,33 @@ class AnalysisResult {
   /// May be `null` if the image has been deleted after processing.
   final String? imageUrl;
 
+  /// Path to a locally cached copy of the scanned image.
+  ///
+  /// Used for displaying the image in results and history without
+  /// requiring a network request.
+  final String? localImagePath;
+
+  /// Returns a copy of this result with the given fields replaced.
+  AnalysisResult copyWith({
+    String? id,
+    String? verdict,
+    double? confidence,
+    DateTime? createdAt,
+    String? recommendation,
+    String? imageUrl,
+    String? localImagePath,
+  }) {
+    return AnalysisResult(
+      id: id ?? this.id,
+      verdict: verdict ?? this.verdict,
+      confidence: confidence ?? this.confidence,
+      createdAt: createdAt ?? this.createdAt,
+      recommendation: recommendation ?? this.recommendation,
+      imageUrl: imageUrl ?? this.imageUrl,
+      localImagePath: localImagePath ?? this.localImagePath,
+    );
+  }
+
   /// Returns the risk level based on the confidence score.
   ///
   /// - [RiskLevel.low]: 0–30%
@@ -53,7 +81,8 @@ class AnalysisResult {
   ///
   /// Expects the document shape written by the Cloud Run backend:
   /// `{ verdict, confidence, storage_path, createdAt }`.
-  factory AnalysisResult.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory AnalysisResult.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return AnalysisResult(
       id: doc.id,
@@ -76,6 +105,7 @@ class AnalysisResult {
       recommendation: json['recommendation'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       imageUrl: json['imageUrl'] as String?,
+      localImagePath: json['localImagePath'] as String?,
     );
   }
 
@@ -90,6 +120,7 @@ class AnalysisResult {
       'recommendation': recommendation,
       'createdAt': createdAt.toIso8601String(),
       'imageUrl': imageUrl,
+      'localImagePath': localImagePath,
     };
   }
 }
