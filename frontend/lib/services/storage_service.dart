@@ -14,8 +14,11 @@ class StorageService {
     required String filename,
     required String userId,
   }) async {
-    final ref = FirebaseStorage.instance
-        .ref('uploads/$userId/${DateTime.now().millisecondsSinceEpoch}_$filename');
+    final storage = FirebaseStorage.instanceFor(
+      bucket: 'gs://derma-3fec9.firebasestorage.app',
+    );
+    final ref = storage
+        .ref('${DateTime.now().millisecondsSinceEpoch}_$filename');
     final uploadTask = ref.putData(bytes);
     final snapshot = await uploadTask;
     return await snapshot.ref.getDownloadURL();
