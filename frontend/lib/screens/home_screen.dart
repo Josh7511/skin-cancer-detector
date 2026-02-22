@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/info_step_card.dart';
-import 'app_shell.dart';
 
 /// The home screen of the application.
 ///
-/// Displays a welcome hero section, a "Start Scan" call-to-action,
-/// a "How It Works" section with three compact step cards, and a brief
-/// medical disclaimer banner linking to the About screen.
+/// Displays a welcome hero section and a "How It Works" section with
+/// three compact step cards. The layout fits within the viewport
+/// without scrolling.
 class HomeScreen extends StatelessWidget {
   /// Creates a [HomeScreen] widget.
   const HomeScreen({super.key});
@@ -16,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Center(
         child: ConstrainedBox(
@@ -45,19 +44,8 @@ class HomeScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
 
-              // ── Start Scan CTA ────────────────────────────────────
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () =>
-                      AppShell.switchTab(context, AppShell.scanTab),
-                  icon: const Icon(Icons.document_scanner),
-                  label: const Text('Start Scan'),
-                ),
-              ),
-              const SizedBox(height: 32),
+              const Spacer(),
 
               // ── How It Works ──────────────────────────────────────
               Text(
@@ -90,59 +78,8 @@ class HomeScreen extends StatelessWidget {
                 description: 'View your results instantly with a confidence '
                     'score and recommendation.',
               ),
-              const SizedBox(height: 32),
 
-              // ── Disclaimer Banner ─────────────────────────────────
-              Card(
-                color: theme.colorScheme.errorContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Medical Disclaimer',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                color: theme.colorScheme.onErrorContainer,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'This tool is for informational purposes '
-                              'only and is not a substitute for '
-                              'professional medical advice.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onErrorContainer,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.arrow_forward,
-                          color: theme.colorScheme.onErrorContainer,
-                        ),
-                        tooltip: 'Learn more',
-                        onPressed: () => AppShell.switchTab(
-                          context,
-                          AppShell.aboutTab,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
+              const Spacer(),
             ],
           ),
         ),
