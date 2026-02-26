@@ -1,131 +1,203 @@
-# Skin Cancer Detector
+# Derma – AI-Assisted Skin Cancer Screening
 
-An AI-powered web application that analyzes images of skin lesions to detect potential skin cancer. Users upload a photo through a Flutter web frontend, the image is processed by a PyTorch deep learning model via a Flask backend, and the results -- including a confidence score and a final verdict -- are returned to the user. The system uses anonymous accounts to protect user privacy.
+Derma is an AI-powered mobile application designed for dermatologists. Clinicians capture or upload dermatoscopic images directly from their phone, and the app delivers an instant AI-powered secondary opinion — classifying the lesion, displaying a confidence score, and storing structured analysis results for review. Derma is built to strengthen clinical confidence and improve efficiency, not replace medical expertise.
 
-## Architecture & Data Flow
+---
+
+## Hack@URI 2026 — NVIDIA Track
+
+> **2nd Place — $1,000 Prize**
+
+Derma was submitted under the **NVIDIA track** at [Hack@URI 2026](https://hackuri.com) and placed **second overall**, winning **$1,000**.
+
+**Team:** Joshua Pereira, Noah Vargas, Ericsen Semedo
+
+---
+
+## Inspiration
+
+Skin cancer is highly treatable when detected early, yet dermatologists face increasing patient demand and limited time per evaluation. We were inspired by the idea of transforming a smartphone into a clinical decision-support tool that delivers an instant AI-powered secondary opinion during examinations.
+
+More broadly, Derma reflects the growing role of artificial intelligence in the ever-changing healthcare environment. As clinical workloads increase and technology advances, AI has the potential to support faster decision making, improve consistency, and expand access to high-quality care.
+
+---
+
+## What It Does
+
+Derma is a mobile AI application designed for dermatologists. It allows clinicians to:
+
+- Capture or upload dermatoscopic images from their phone
+- Receive a classification of **potential cancer** or **non-cancer**
+- View a **confidence score** representing the model's certainty
+- Store and review **structured analysis results** via a scan history screen
+
+The app functions as a real-time AI assistant within a dermatologist's workflow.
+
+---
+
+## How We Built It
+
+### AI Model
+
+We used **YOLO26s-cls**, a lightweight image classification model optimized for fast and efficient inference.
+
+- Trained on approximately **10,000 dermatoscopic images**
+- Training performed on the **URI Unity Cluster**
+- Tuned for deployment in a cloud-based production environment
+
+Images are preprocessed using **OpenCV** before being passed into the trained model for classification.
+
+### Backend & Cloud Infrastructure
+
+We designed a scalable, production-ready cloud architecture:
+
+- **Flutter** (iOS, Android, Web) — cross-platform mobile and web frontend
+- **Flask** (Python) — backend API handling inference requests and logging
+- **Docker** — containerizes the backend and model environment for consistent builds
+- **Artifact Registry** — stores and manages container images
+- **Google Cloud Run** — deploys and auto-scales containers based on traffic
+- **Firebase Storage** — holds uploaded dermatoscopic images
+- **Cloud Firestore** — stores structured analysis results (NoSQL)
+- **Firebase Authentication** — anonymous auth for secure, privacy-preserving access
+
+### System Flow
 
 ```
-Flutter (Web Frontend)
+Flutter (Mobile/Web)
     |
-    | 1. User uploads skin image
+    | 1. Clinician captures or uploads dermatoscopic image
     v
 Firebase Storage
     |
-    | 2. Image stored, triggers processing
+    | 2. Image stored in cloud bucket
     v
-Flask (Backend API)
+Flask API (Cloud Run)
     |
-    | 3. Image retrieved and preprocessed
+    | 3. Image retrieved and preprocessed with OpenCV
     v
-OpenCV + PyTorch (AI Model)
+YOLO26s-cls Model
     |
     | 4. Classification: cancer vs. non-cancer
     | 5. Confidence score generated
     v
-Cloud Firestore (Database)
+Cloud Firestore
     |
-    | 6. Results written (verdict, confidence, metadata)
+    | 6. Results written (verdict, confidence, timestamp, recommendation)
     v
-Flutter (Web Frontend)
+Flutter (Mobile/Web)
     |
-    | 7. User sees results: verdict, confidence score, recommendation
+    | 7. Real-time listener displays results to clinician
     v
-User
+Clinician
 ```
 
-### Flow Summary
+Docker ensures consistent environments across development and production. Containers are pushed to Artifact Registry, and Cloud Run automatically scales them based on incoming traffic.
 
-1. **Flutter** -- User opens the web app, authenticates anonymously via Firebase Auth, and uploads a photo of a skin lesion.
-2. **Firebase Storage** -- The image is uploaded to a Cloud Storage bucket.
-3. **Flask** -- The backend detects the new upload (via Cloud Function trigger or polling), retrieves the image from Storage.
-4. **OpenCV / PyTorch** -- The image is preprocessed (resized, normalized) with OpenCV, then fed into a PyTorch CNN trained on a skin cancer dataset. The model outputs a classification and confidence score.
-5. **Cloud Firestore** -- The results (verdict, confidence percentage, timestamp, recommendation) are written to a Firestore document linked to the user's anonymous session.
-6. **Flutter** -- The frontend listens to the Firestore document in real-time and displays the results to the user.
+---
 
 ## Features
 
-- **AI-Powered Analysis** -- Deep learning model trained on dermatological image datasets to classify skin lesions.
-- **Confidence Score** -- Users see the model's confidence level (e.g., 87.3%) so they understand the certainty of the result.
-- **Smart Recommendations**:
-  - If flagged as potential cancer: strongly recommend visiting a dermatologist.
-  - If not flagged but user is concerned: suggest visiting a doctor for peace of mind.
-- **Anonymous Accounts** -- Users are authenticated anonymously via Firebase Auth. No personal data is collected or stored.
-- **Real-Time Results** -- Firestore real-time listeners push results to the frontend as soon as analysis completes.
-- **Privacy First** -- Images are processed and results are tied only to anonymous session IDs.
+- **AI-Powered Analysis** — YOLO26s-cls model trained on dermatoscopic images classifies lesions as potential cancer or non-cancer.
+- **Confidence Score** — Displays the model's certainty (e.g., 87.3%) so clinicians can weigh the result appropriately.
+- **Smart Recommendations**
+  - If flagged as potential cancer: strongly recommend consulting a specialist.
+  - If not flagged but concern remains: suggest a follow-up evaluation.
+- **Scan History** — Clinicians can review past analyses stored in Firestore, organized by session.
+- **Anonymous Accounts** — Users authenticate anonymously via Firebase Auth. No personal data is collected or stored.
+- **Real-Time Results** — Firestore real-time listeners push results to the app as soon as analysis completes.
+- **Dark / Light Mode** — Theme toggle for comfortable use in any clinical environment.
+- **Privacy First** — Images and results are tied only to anonymous session IDs.
+
+---
 
 ## Tech Stack
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Frontend** | Flutter (Web) | Cross-platform UI, image upload, results display |
-| **Auth** | Firebase Anonymous Auth | Privacy-preserving user sessions |
+| **Frontend** | Flutter (iOS, Android, Web) | Cross-platform UI, image capture/upload, results display |
+| **State Management** | Provider | App-wide state for auth, history, and theme |
+| **Auth** | Firebase Anonymous Auth | Privacy-preserving clinician sessions |
 | **Storage** | Firebase Cloud Storage | Temporary image storage for processing |
 | **Backend** | Flask (Python) | REST API, orchestrates image processing pipeline |
-| **Image Processing** | OpenCV | Image preprocessing (resize, normalize, augment) |
-| **AI Model** | PyTorch | CNN-based skin lesion classification |
+| **Image Processing** | OpenCV | Preprocessing (resize, normalize) before inference |
+| **AI Model** | YOLO26s-cls (Ultralytics) | Dermatoscopic image classification |
 | **Database** | Cloud Firestore | Store analysis results, real-time sync to frontend |
-| **Cloud** | Google Cloud Platform | Hosting, Cloud Functions, infrastructure |
+| **Containerization** | Docker | Consistent build and deployment environment |
+| **Registry** | Artifact Registry | Container image storage and versioning |
+| **Cloud** | Google Cloud Run | Serverless, auto-scaling container deployment |
 
-## Project Structure (Planned)
+---
+
+## Project Structure
 
 ```
-skin_cancer_detector/
-├── frontend/                  # Flutter web application
+skin-cancer-detector/
+├── frontend/                        # Flutter application (iOS, Android, Web)
 │   ├── lib/
 │   │   ├── main.dart
-│   │   ├── screens/          # Upload screen, results screen
-│   │   ├── services/         # Firebase auth, storage, firestore
-│   │   ├── widgets/          # Reusable UI components
-│   │   └── models/           # Data models (analysis result, etc.)
+│   │   ├── firebase_options.dart
+│   │   ├── screens/                 # home, upload, results, history, about, app_shell
+│   │   ├── services/                # auth, storage, firestore, analysis, local_storage, image_cache
+│   │   ├── widgets/                 # scan_card, step_indicator, confidence_gauge, info_step_card, theme_toggle
+│   │   ├── models/                  # analysis_result
+│   │   ├── providers/               # auth, history, theme
+│   │   └── theme/                   # app_theme
+│   ├── android/
+│   ├── ios/
 │   ├── web/
-│   ├── pubspec.yaml
-│   └── ...
+│   └── pubspec.yaml
 │
-├── backend/                   # Backend services
-│   ├── cloud/
-│   │   ├── main.py           # Cloud Function entry point
-│   │   └── Dockerfile        # Container image for backend deployment
-│   └── requirements.txt      # Python dependencies
+├── backend/
+│   └── cloud/
+│       ├── main.py                  # Flask entry point
+│       ├── predict.py               # YOLO26s-cls inference logic
+│       ├── Dockerfile               # gunicorn on port 8080
+│       └── requirements.txt
 │
-├── model/                     # ML model artifacts
-│   ├── weights/               # Trained .pt files (gitignored)
-│   └── test_images/           # Test images for local inference (gitignored)
+├── model/
+│   ├── weights/                     # Trained model weights (gitignored)
+│   └── test_images/                 # Local test images (gitignored)
 │
-├── AGENTS.md                  # AI agent rules
+├── AGENTS.md
 ├── .gitignore
-└── README.md                  # This file
+└── README.md
 ```
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Flutter SDK** (3.x+) -- [Install Flutter](https://docs.flutter.dev/get-started/install)
-- **Python** (3.10+) -- [Install Python](https://www.python.org/downloads/)
-- **Firebase CLI** -- `npm install -g firebase-tools`
-- **Google Cloud SDK** -- [Install gcloud](https://cloud.google.com/sdk/docs/install)
+- **Flutter SDK** (3.x+) — [Install Flutter](https://docs.flutter.dev/get-started/install)
+- **Python** (3.10+) — [Install Python](https://www.python.org/downloads/)
+- **Docker** — [Install Docker](https://docs.docker.com/get-docker/)
+- **Firebase CLI** — `npm install -g firebase-tools`
+- **Google Cloud SDK** — [Install gcloud](https://cloud.google.com/sdk/docs/install)
 - A **Firebase project** with Anonymous Auth, Cloud Storage, and Firestore enabled
 
 ### Backend Setup
 
 ```bash
 # Navigate to backend
-cd backend/
+cd backend/cloud/
 
-# Create virtual environment
+# Build and run the Docker container locally
+docker build -t derma-backend .
+docker run -p 8080:8080 derma-backend
+
+# Or run directly with a virtual environment
 python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\activate   # Windows
+source .venv/bin/activate       # macOS/Linux
+# .venv\Scripts\activate        # Windows
 
-# Install dependencies
 pip install -r requirements.txt
 
 # Set environment variables
 cp .env.example .env
 # Edit .env with your Firebase credentials and config
 
-# Run the Flask server
-flask run --port 5000
+flask run --port 8080
 ```
 
 ### Frontend Setup
@@ -140,9 +212,17 @@ flutter pub get
 # Configure Firebase
 flutterfire configure
 
-# Run in Chrome
+# Run on iOS simulator
+flutter run -d ios
+
+# Run on Android emulator
+flutter run -d android
+
+# Run in Chrome (web)
 flutter run -d chrome
 ```
+
+---
 
 ## Environment Variables
 
@@ -151,13 +231,17 @@ flutter run -d chrome
 | `FIREBASE_PROJECT_ID` | Your Firebase project ID |
 | `FIREBASE_STORAGE_BUCKET` | Cloud Storage bucket name |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Path to service account key JSON |
-| `MODEL_WEIGHTS_PATH` | Path to trained PyTorch model weights |
+| `MODEL_WEIGHTS_PATH` | Path to trained YOLO model weights |
 | `FLASK_ENV` | `development` or `production` |
-| `FLASK_PORT` | Port for Flask server (default: 5000) |
+| `PORT` | Port for Flask/gunicorn server (default: 8080) |
+
+---
 
 ## Disclaimer
 
-This application is intended for **educational and informational purposes only**. It is **not** a medical device and should **not** be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for any concerns about skin lesions or cancer. The AI model's predictions are probabilistic and may be incorrect.
+This application is intended for **educational and research purposes only**. It is **not** a certified medical device and should **not** be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for any concerns about skin lesions or cancer. The AI model's predictions are probabilistic and may be incorrect.
+
+---
 
 ## License
 
