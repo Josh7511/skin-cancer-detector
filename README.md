@@ -165,12 +165,6 @@ skin-cancer-detector/
 
 ---
 
-## Disclaimer
-
-This application is intended for **educational and research purposes only**. It is **not** a certified medical device and should **not** be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for any concerns about skin lesions or cancer. The AI model's predictions are probabilistic and may be incorrect.
-
----
-
 ## License
 
 TBD
